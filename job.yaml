@@ -1,0 +1,29 @@
+resources:
+  jobs:
+    Medallion:
+      name: Medallion
+      schedule:
+        quartz_cron_expression: 24 58 22 * * ?
+        timezone_id: America/Recife
+        pause_status: UNPAUSED
+      tasks:
+        - task_key: to_bronze
+          notebook_task:
+            notebook_path: /Workspace/Users/thiagorocket276@gmail.com/rocketlab1/Landing_to_Bronze
+            source: WORKSPACE
+        - task_key: to_silver
+          depends_on:
+            - task_key: to_bronze
+          run_if: AT_LEAST_ONE_SUCCESS
+          notebook_task:
+            notebook_path: /Workspace/Users/thiagorocket276@gmail.com/rocketlab1/Bronze_to_Silver
+            source: WORKSPACE
+        - task_key: to_gold
+          depends_on:
+            - task_key: to_silver
+          notebook_task:
+            notebook_path: /Workspace/Users/thiagorocket276@gmail.com/rocketlab1/Silver_to_Gold
+            source: WORKSPACE
+      queue:
+        enabled: true
+      performance_target: PERFORMANCE_OPTIMIZED
